@@ -25,6 +25,28 @@ flowchart TD
     CR --> CAM[Adventure Creator Camera + Post Processing]
 ```
 
+## Featured system: Clash Snap
+
+Clash Snap turns one attack input into a coordinated targeting, movement, skill-selection, defense, and status-resolution pipeline:
+
+- `vSnapAttackHook` arbitrates mutually exclusive attack spaces: normal/Clash skill, Power Clash, Defender, and optional extra managers.
+- `vSnapToTarget` selects a target from directional input, lock-on state, range, view angle, and line of sight, then performs a short controlled approach.
+- `PlayerClashManager` selects available normal or context-sensitive special skills, manages runtime cooldowns, and exposes the active clash card.
+- `PlayerClashDefender` resolves successful defense and guard-break outcomes while safely capturing and restoring player control state.
+- `PlayerStatusEffectManager` applies Clash consequences, forced reactions, control locks, stat modifiers, VFX, and cleanup.
+- `PlayerClashSkill` and `EnemyClashSkill` keep attack tuning in reusable `ScriptableObject` assets.
+
+```mermaid
+flowchart TD
+    I[Combat input] --> H[vSnapAttackHook]
+    H --> T[vSnapToTarget]
+    T --> M[Clash manager or Defender]
+    M --> R[Strike / Breaker / Defender resolution]
+    R --> S[Status effects and recovery]
+```
+
+The full decision flow is documented in [`docs/clash-snap.md`](docs/clash-snap.md).
+
 ## Repository map
 
 | Path | Responsibility |
@@ -35,7 +57,9 @@ flowchart TD
 | `src/Director/CameraData.cs` | Cinematic shot configuration |
 | `src/Director/CameraSequencer.cs` | Shot order, transitions, and camera handoff |
 | `src/Director/CinemaSmartRig.cs` | Runtime camera motion, optics, impact, and time effects |
+| `src/ClashSnap/` | Target snap, attack arbitration, Clash skills, defense, and player status effects |
 | `docs/architecture.md` | Runtime flow and design decisions |
+| `docs/clash-snap.md` | Clash Snap rules, sequence, and component responsibilities |
 | `docs/dependencies.md` | Package boundaries and omitted project content |
 
 ## Technical boundaries
@@ -46,6 +70,7 @@ The sample references these Unity packages through their public APIs:
 - Adventure Creator
 - Invector Third Person Controller
 - SALSA LipSync Suite
+- The original project's `MalbersAnimations.Cards` Clash contracts
 
 Those packages are **not** redistributed here. See [`docs/dependencies.md`](docs/dependencies.md) for the file-by-file mapping.
 
@@ -53,7 +78,7 @@ Those packages are **not** redistributed here. See [`docs/dependencies.md`](docs
 
 This is production-oriented prototype code extracted from a larger Unity project for code review. It demonstrates the architecture and integration work, but it is not intended to compile as a standalone Unity project without the listed packages and original scene setup.
 
-Combat Flow and Snap components are being prepared separately; they are intentionally excluded from this first release because their supporting project classes are not yet part of the sample.
+The Director and Clash Snap source folders are coherent extracts from the original project. They still rely on the packages and project-level combat contracts listed in [`docs/dependencies.md`](docs/dependencies.md), so this repository remains a code-review sample rather than a standalone Unity project.
 
 ## Project links
 
